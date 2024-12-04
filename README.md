@@ -151,4 +151,4 @@ Así pues, Caliso no solo satisface la necesidad de recordatorios efectivos y di
 
 ### ¡Gracias por confiar en Caliso y por formar parte de este proyecto! Si tienes alguna pregunta o sugerencia, no dudes en contactarnos. ¡Esperamos que Caliso te ayude a mantenerte organizado y a no olvidar nada importante en tu día a día!
 
-##Att: Equipo de Caliso
+## Att: Equipo de Caliso
