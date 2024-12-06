@@ -27,7 +27,3 @@ export type SearchBarTypes = {
     setShowOptions: () => void;
     onSearch: () => void;
 }
-
-export type ButtonNewTaskTypes = {
-    onPress: () => void;
-}

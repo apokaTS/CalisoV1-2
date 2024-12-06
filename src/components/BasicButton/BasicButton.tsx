@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     textFormat : {
         color : '#fff',
         fontSize : 32,
-        fontWeight : '200',
+        fontWeight : '400',
     },
     colorOne : {
         backgroundColor : '#2c2c2c',

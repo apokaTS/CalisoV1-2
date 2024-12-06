@@ -14,7 +14,7 @@ function App(): React.JSX.Element {
 
   const taskList = [
     { id: 0, desc: 'Hacer 20 planas' },
-    { id: 1, desc: 'PROCRASTINAR' },
+    { id: 1, desc: 'EL CUETE DEL TONA' },
     { id: 2, desc: 'Ensayo de algo' },
   ];
 
@@ -94,7 +94,7 @@ function App(): React.JSX.Element {
           <ImageBackground
             style={styles.backgroundContainer}
             source={require('./src/assets/calisobg.png')}>
-            {navigate === 'Home' ? <Home data={arrayTask} /> : <AddTask />}
+            {navigate === 'Home' ? <Home data={arrayTask} /> : <AddTask text1='' text2=''/>}
           </ImageBackground>
         </View>
       </ScrollView>
