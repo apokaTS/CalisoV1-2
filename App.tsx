@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,14 +8,14 @@ import {
 } from 'react-native';
 import Home from './src/screens/Home';
 import AddTask from './src/screens/AddTask';
-import ButtonNewTask from './src/components/ButtonNewTask/ButtonNewTask';
+import BottomBarNavigation from './src/components/BottomBarNavigation/BottomBarNavigation';
+import CompletedTask from './src/screens/CompletedTask';
+import TaskDetails from './src/screens/TaskDetails';
 
 function App(): React.JSX.Element {
-
   const taskList = [
-    { id: 0, desc: 'Hacer 20 planas' },
-    { id: 1, desc: 'EL CUETE DEL TONA' },
-    { id: 2, desc: 'Ensayo de algo' },
+    {id: 0, desc: 'Hacer 20 planas'},
+    {id: 1, desc: 'PROCRASTINAR'},
   ];
 
   const arrayTask = [
@@ -87,6 +87,8 @@ function App(): React.JSX.Element {
 
   const [navigate, setNavigate] = useState<string>('Home');
 
+  const [itemIndexted, setItemIndexted] = useState<number>(0);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.contentContainerStyle}>
@@ -94,18 +96,33 @@ function App(): React.JSX.Element {
           <ImageBackground
             style={styles.backgroundContainer}
             source={require('./src/assets/calisobg.png')}>
-            {navigate === 'Home' ? <Home data={arrayTask} /> : <AddTask text1='' text2=''/>}
+            {navigate === 'Home' ? (
+              <Home
+                data={arrayTask}
+                onPressItem={index => {
+                  setNavigate('TaskDetails');
+                  setItemIndexted(index);
+                }}
+              />
+            ) : navigate === 'AddTask' ? (
+              <AddTask />
+            ) : navigate === 'CompletedTask' ? (
+              <CompletedTask />
+            ) : (
+              <TaskDetails data={arrayTask} itemDetails={itemIndexted} />
+            )}
           </ImageBackground>
         </View>
       </ScrollView>
-        <View style={styles.buttonBottom}>
-          <ButtonNewTask
-            onPress={() => setNavigate('AddTask')}
-          />
-        </View>
-    </SafeAreaView >
+      <View style={styles.buttonBottom}>
+        <BottomBarNavigation
+          onPressTask={() => setNavigate('CompletedTask')}
+          onPressAdd={() => setNavigate('AddTask')}
+          onPressHome={() => setNavigate('Home')}
+        />
+      </View>
+    </SafeAreaView>
   );
-
 }
 
 const styles = StyleSheet.create({
@@ -127,8 +144,7 @@ const styles = StyleSheet.create({
   },
   buttonBottom: {
     marginTop: 0,
-    backgroundColor: '#0E2038',
-    alignItems: 'center',
+    width: '100%',
   },
 });
 

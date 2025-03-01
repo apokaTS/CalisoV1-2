@@ -11,7 +11,7 @@ import { HomeTypes } from '../utils/types/HomeScreen';
 
 
 
-const Home = ({ data }: HomeTypes) => {
+const Home = ({ data, onPressItem }: HomeTypes) => {
 
     const [search, onSetSearch] = useState<string>('');
     const arrayFilters = [
@@ -100,7 +100,7 @@ const Home = ({ data }: HomeTypes) => {
                     <CardTask
                         title={item.title}
                         limitTask={item.final}
-                        onPress={() => console.log(item.title)}
+                        onPress={() => onPressItem(index)}
                         startTask={item.inicio}
                         statusCard={item.status}
                         task={item.task}

@@ -14,6 +14,7 @@
     "@types/react-native-vector-icons": "^6.4.18",
     "react": "18.3.1",
     "react-native": "0.76.1",
+    "react-native-date-picker": "^5.0.8",
     "react-native-vector-icons": "^10.2.0"
   },
   "devDependencies": {

@@ -40,8 +40,8 @@ const{ width } = Dimensions.get('screen');
 const styles = StyleSheet.create({
     mainContainer: {
         width : width * 0.9,
-        height: 50,
-        borderRadius: 15,
+        height: 60,
+        borderRadius: 10,
         flexDirection: 'row',
         alignItems : 'center',
         justifyContent : 'center',
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     textFormat : {
         color : '#fff',
         fontSize : 32,
-        fontWeight : '400',
+        fontWeight : 'bold',
     },
     colorOne : {
         backgroundColor : '#2c2c2c',

@@ -1,17 +1,23 @@
 export type HomeTypes = {
     data: ArrayTaskTypes[];
+    onPressItem?: (id: number) => void;
 }
 
 export type ArrayTaskTypes = {
     title: string;
-    task: TastTypes[];
+    task: TaskTypes[];
     inicio: string;
     final: string;
     status: string;
     filter: string;
 }
 
-type TastTypes = {
+type TaskTypes = {
     id: number;
     desc: string;
+}
+
+export type TaskDetailsTypes = {
+    data: ArrayTaskTypes[];
+    itemDetails: number;
 }
