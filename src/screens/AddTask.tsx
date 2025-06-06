@@ -9,6 +9,25 @@ const AddTask = () => {
   //Cambio de variable para el cambio de descripcion
   const [descText, setDescText] = useState<string>('');
 
+  const [dueDate, setDueDate] = useState(new Date());
+
+  const saveTask = async () => {
+    try {
+      const response = await fetch('http://192.168.3.122:3000/tasks', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          titleText,
+          descText,
+        }),
+      });
+      const data = await response.json();
+      console.log('Guardado:', data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.mainContainer}>
       <Text style={styles.titleText}>Agregar Recordatorios</Text>
@@ -35,14 +54,10 @@ const AddTask = () => {
       </View>
       <View style={styles.dateContainer}>
         <Text style={styles.staticTextOfDate}>Fecha Limite</Text>
-        <DatePicker />
+        <DatePicker onDateChange={setDueDate}/>
       </View>
       <View style={styles.containerBottom}>
-        <BasicButton
-          onPress={() => console.log('Funcionando')}
-          text="Crear"
-          variant={1}
-        />
+        <BasicButton onPress={() => saveTask()} text="Crear" variant={1} />
       </View>
     </View>
   );
