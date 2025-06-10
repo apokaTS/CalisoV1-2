@@ -6,8 +6,8 @@ const Task = require('../models/TaskModel');
 // Crear nueva tarea
 router.post('/', async (req, res) => {
   try {
-    const { titleText, descText, dueDate } = req.body;
-    const newTask = new Task({ titleText, descText, dueDate });
+    const { titleText, descText, dueDate, isCompleted, createdAt } = req.body;
+    const newTask = new Task({ titleText, descText, dueDate, isCompleted, createdAt });
     await newTask.save();
     res.status(201).json(newTask);
   } catch (error) {

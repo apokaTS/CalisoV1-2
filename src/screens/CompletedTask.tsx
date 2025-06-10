@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList} from 'react-native';
 import CheckBox from '../components/CheckBox/CheckBox';
 
 // Datos de ejemplo (puedes reemplazarlos con datos reales)

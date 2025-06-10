@@ -11,6 +11,8 @@ const AddTask = () => {
 
   const [dueDate, setDueDate] = useState(new Date());
 
+  const isCompleted = false;
+
   const saveTask = async () => {
     try {
       const response = await fetch('http://192.168.3.122:3000/tasks', {
@@ -19,6 +21,9 @@ const AddTask = () => {
         body: JSON.stringify({
           titleText,
           descText,
+          dueDate,
+          isCompleted,
+          createdAt: new Date().toISOString(),
         }),
       });
       const data = await response.json();
@@ -56,9 +61,8 @@ const AddTask = () => {
         <Text style={styles.staticTextOfDate}>Fecha Limite</Text>
         <DatePicker onDateChange={setDueDate}/>
       </View>
-      <View style={styles.containerBottom}>
-        <BasicButton onPress={() => saveTask()} text="Crear" variant={1} />
-      </View>
+      <View style={styles.containerBottom} />
+        <BasicButton onPress={saveTask} text="Crear" variant={1}/>
     </View>
   );
 };

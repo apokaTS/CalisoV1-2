@@ -17,7 +17,7 @@ app.get('/api/test', (req, res) => {
 app.use('/tasks', taskRoutes); // <-- Montamos las rutas bajo /tasks
 
 // Conexión a MongoDB y arranque del servidor
-mongoose.connect('mongodb://127.0.0.1:27017/calisoDataBase')
+mongoose.connect('mongodb://127.0.0.1:27017/calisoApp')
   .then(() => {
     console.log('Conectado a MongoDB');
     app.listen(3000, () => console.log('Servidor iniciado en puerto 3000'));
