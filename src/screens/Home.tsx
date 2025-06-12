@@ -36,7 +36,7 @@ const Home = ({ data, onPressItem }: HomeTypes) => {
     //FILTRO BUSQUEDA NOMBRE
     const filterSearch = () => {
         return data.filter(task =>
-            task.title.toLowerCase().includes(search.toLowerCase()),
+            task.titleText.toLowerCase().includes(search.toLowerCase()),
         );
     };
 
@@ -98,7 +98,7 @@ const Home = ({ data, onPressItem }: HomeTypes) => {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, index }) => (
                     <CardTask
-                        title={item.title}
+                        title={item.titleText}
                         limitTask={item.final}
                         onPress={() => onPressItem(index)}
                         startTask={item.inicio}

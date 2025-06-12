@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -18,76 +18,33 @@ function App(): React.JSX.Element {
     {id: 1, desc: 'PROCRASTINAR'},
   ];
 
-  const arrayTask = [
-    {
-      title: 'Tarea de Español',
-      task: taskList,
-      inicio: '9-10-2024',
-      final: '15-10-2024',
-      status: '#04BB00',
-      filter: 'Nuevas',
-    },
-    {
-      title: 'Tarea de Filosofia',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#04BB00',
-      filter: 'Nuevas',
-    },
-    {
-      title: 'Tarea de Matematicas',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#FF9900',
-      filter: 'Proxima a vencer',
-    },
-    {
-      title: 'Tarea de Termodinamica',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#04BB00',
-      filter: 'Nuevas',
-    },
-    {
-      title: 'Tarea de Biologia',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#FF9900',
-      filter: 'Proxima a vencer',
-    },
-    {
-      title: 'Tarea de Fisica',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#04BB00',
-      filter: 'Nuevas',
-    },
-    {
-      title: 'Tarea de Programacion',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#FF0000',
-      filter: 'Vencidas',
-    },
-    {
-      title: 'Tarea de Aereonautica',
-      task: taskList,
-      inicio: '10-10-2024',
-      final: '15-10-2024',
-      status: '#04BB00',
-      filter: 'Nuevas',
-    },
-  ];
+  const [arrayTask, setArratyTask] = useState(taskList);
 
   const [navigate, setNavigate] = useState<string>('Home');
 
   const [itemIndexted, setItemIndexted] = useState<number>(0);
+
+  const getTask = async () => {
+    try {
+      const response = await fetch('http://192.168.3.122:3000/tasks', {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+      });
+      const data = await response.json();
+      console.log('Tareas obtenidas:', JSON.stringify(data, null, 2));
+      setArratyTask(data);
+      return data;
+    } catch (error) {
+      console.error('Error al obtener las tareas:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+  if (navigate === 'Home') {
+    getTask();
+  }
+}, [navigate]);
 
   return (
     <SafeAreaView style={styles.container}>
