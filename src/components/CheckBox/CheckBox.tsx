@@ -1,16 +1,29 @@
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 
-const CheckBox = () => {
-  const [checkbox, setCheckbox] = useState<boolean>(false);
+type CheckBoxProps = {
+  checked?: boolean;
+  disabled?: boolean;
+  onChange?: (checked: boolean) => void;
+};
+
+const CheckBox = ({ checked = false, disabled = false, onChange }: CheckBoxProps) => {
+  const [checkbox, setCheckbox] = useState<boolean>(checked);
 
   function handlePressChecked() {
+    if (disabled) {return;}
     setCheckbox(!checkbox);
+    onChange && onChange(!checkbox);
   }
+
+  React.useEffect(() => {
+    setCheckbox(checked);
+  }, [checked]);
 
   return (
     <TouchableOpacity
       onPress={handlePressChecked}
+      disabled={disabled}
       style={[
         styles.checkContainer,
         checkbox ? styles.checkContainerCheck : null,

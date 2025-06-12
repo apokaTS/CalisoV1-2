@@ -14,7 +14,7 @@ export type ArrayTaskTypes = {
   /** Título de la sección o fase. */
   titleText: string;
 
-  /** Lista de tareas asociadas a esta sección. */
+  /** Descripción de la tarea (ahora string, no array). */
   descText: string;
 
   /** Fecha/hora de inicio de la sección. */

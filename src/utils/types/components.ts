@@ -14,20 +14,11 @@ export type CardTypes = {
   /** Estado general de la tarjeta/tarea (como cadena). */
   statusCard: string;
 
-  /** Lista de subtareas o elementos asociados a la tarjeta. */
-  task: ArrayTask[];
+  /** Descripción de la tarea (ahora string, no array). */
+  desc: string;
 
   /** Función que se ejecuta al presionar la tarjeta. */
   onPress: () => void;
-};
-
-// ArrayTask: representa una sub-tarea o ítem con identificador y descripción.
-type ArrayTask = {
-  /** Identificador único de la sub-tarea (numérico). */
-  id: number;
-
-  /** Descripción detallada de la sub-tarea. */
-  desc: string;
 };
 
 // FilterLabelTypes: define las props para un componente que muestra una etiqueta de filtro.

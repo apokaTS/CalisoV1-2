@@ -4,49 +4,55 @@ import { CardTypes } from '../../utils/types/components';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Checkbox from '../CheckBox/CheckBox';
 
+type CardTaskProps = CardTypes & {
+  checked: boolean;
+  onCheck: () => void;
+};
 
-
-const CardTask = ({ title, startTask, limitTask, statusCard, task = [{ id: 0, desc: 'Tarea Default' }, { id: 1, desc: 'Tarea Default 2' }], onPress }: CardTypes) => {
-    return (
-        <TouchableOpacity onPress={onPress} style={styles.mainContainer}>
-            <View style={styles.basicContainer}>
-                <Text style={styles.titleCard}>{title}</Text>
-                <View style={[styles.statusIndicator, { backgroundColor: statusCard }]} />
-            </View>
-            <View style={styles.basicViewColumn}>
-                {task.map((item, index) => (
-                    <View key={index} style={styles.viewListElement}>
-                        <Text style={styles.textDots}>{'• '}</Text>
-                        <Text style={styles.textFormat}>{item.desc}</Text>
-                    </View>
-                ))}
-            </View>
-            <View style={styles.basicContainer}>
-                <View style={[styles.basicViewColumn, styles.centerView]}>
-                    <View style={styles.viewListElement}>
-                        <Icon name="clock-o" color={'#000'} size={24} />
-                        <Text style={styles.textSemiBold}>{' Iniciada:'}</Text>
-                    </View>
-                    <Text style={styles.textDate}>
-                        {startTask}
-                    </Text>
-                </View>
-                <View style={[styles.basicViewColumn, styles.centerView]}>
-                    <View style={styles.viewListElement}>
-                        <Icon name="clock-o" color={'#000'} size={24} />
-                        <Text style={styles.textSemiBold}>{' Vence:'}</Text>
-                    </View>
-                    <Text style={styles.textDate}>
-                        {limitTask}
-                    </Text>
-                </View>
-                <View style={[styles.basicViewColumn, styles.centerView]}>
-                    <Text style={styles.textSemiBold}>{'Finalizar'}</Text>
-                    <Checkbox />
-                </View>
-            </View>
-        </TouchableOpacity >
-    );
+const CardTask = ({
+  title,
+  startTask,
+  limitTask,
+  statusCard,
+  desc,
+  onPress,
+  checked,
+  onCheck,
+}: CardTaskProps) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.mainContainer}>
+      <View style={styles.basicContainer}>
+        <Text style={styles.titleCard}>{title}</Text>
+        <View style={[styles.statusIndicator, { backgroundColor: statusCard }]} />
+      </View>
+      <View style={styles.basicViewColumn}>
+        <View style={styles.viewListElement}>
+          <Text style={styles.textDots}>{'• '}</Text>
+          <Text style={styles.textFormat}>{desc}</Text>
+        </View>
+      </View>
+      <View style={styles.basicContainer}>
+        <View style={[styles.basicViewColumn, styles.centerView]}>
+          <View style={styles.viewListElement}>
+            <Icon name="clock-o" color={'#000'} size={24} />
+            <Text style={styles.textSemiBold}>{' Iniciada:'}</Text>
+          </View>
+          <Text style={styles.textDate}>{startTask}</Text>
+        </View>
+        <View style={[styles.basicViewColumn, styles.centerView]}>
+          <View style={styles.viewListElement}>
+            <Icon name="clock-o" color={'#000'} size={24} />
+            <Text style={styles.textSemiBold}>{' Vence:'}</Text>
+          </View>
+          <Text style={styles.textDate}>{limitTask}</Text>
+        </View>
+        <View style={[styles.basicViewColumn, styles.centerView]}>
+          <Text style={styles.textSemiBold}>{'Finalizar'}</Text>
+          <Checkbox checked={checked} onChange={onCheck} />
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 };
 
 export default CardTask;

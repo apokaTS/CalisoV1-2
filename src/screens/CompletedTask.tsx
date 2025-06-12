@@ -1,61 +1,44 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList} from 'react-native';
+import { View, Text, FlatList, StyleSheet, ImageBackground } from 'react-native';
 import CheckBox from '../components/CheckBox/CheckBox';
 
-// Datos de ejemplo (puedes reemplazarlos con datos reales)
-const completedTasks = [
-  { id: '1', title: 'Tarea 1', completed: true },
-  { id: '2', title: 'Tarea 2', completed: true },
-  { id: '3', title: 'Tarea 3', completed: true },
-];
-
-const CompletedTask = () => {
-  const renderTask = ({ item }: { item: { id: string; title: string; completed: boolean } }) => (
-    <View style={styles.taskContainer}>
-      <CheckBox value={item.completed} disabled={true} />
-      <Text style={styles.taskText}>{item.title}</Text>
+const CompletedTask = ({ data }) => {
+  const renderItem = ({ item }) => (
+    <View style={styles.row}>
+      <CheckBox checked={true} disabled={true} />
+      <Text style={styles.text}>{item.titleText}</Text>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Tareas Completadas</Text>
+    <ImageBackground
+      style={styles.background}
+      source={require('../assets/calisobg.png')} // Ajusta la ruta si es necesario
+      resizeMode="cover"
+    >
       <FlatList
-        data={completedTasks}
-        keyExtractor={(item) => item.id}
-        renderItem={renderTask}
+        data={data}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderItem}
+        ListHeaderComponent={
+          <Text style={styles.header}>Tareas Completadas</Text>
+        }
+        contentContainerStyle={styles.container}
       />
-    </View>
+    </ImageBackground>
   );
 };
 
-export default CompletedTask;
-
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#f9f9f9',
+    width: '100%',
+    height: '100%',
   },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  taskContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#fff',
-    marginBottom: 8,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  taskText: {
-    marginLeft: 10,
-    fontSize: 16,
-  },
+  container: { padding: 16 },
+  header: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
+  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  text: { marginLeft: 12, fontSize: 16 },
 });
+
+export default CompletedTask;

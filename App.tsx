@@ -13,16 +13,27 @@ import CompletedTask from './src/screens/CompletedTask';
 import TaskDetails from './src/screens/TaskDetails';
 
 function App(): React.JSX.Element {
+  // Puedes dejar este array como fallback si el fetch falla
   const taskList = [
     {id: 0, desc: 'Hacer 20 planas'},
     {id: 1, desc: 'PROCRASTINAR'},
   ];
 
   const [arrayTask, setArratyTask] = useState(taskList);
-
   const [navigate, setNavigate] = useState<string>('Home');
-
   const [itemIndexted, setItemIndexted] = useState<number>(0);
+
+  // Función para transformar los datos del backend al formato esperado por Home
+  const transformTasks = (tasksFromBackend: any[]) => {
+    return tasksFromBackend.map(task => ({
+      titleText: task.titleText,
+      descText: task.descText,
+      inicio: task.createdAt ? new Date(task.createdAt).toLocaleDateString() : '',
+      final: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '',
+      status: task.isCompleted ? 'Completada' : 'Pendiente',
+      filter: task.isCompleted ? 'Vencidas' : 'Nuevas', // Ajusta según tu lógica de filtros
+    }));
+  };
 
   const getTask = async () => {
     try {
@@ -31,9 +42,9 @@ function App(): React.JSX.Element {
         headers: {'Content-Type': 'application/json'},
       });
       const data = await response.json();
-      console.log('Tareas obtenidas:', JSON.stringify(data, null, 2));
-      setArratyTask(data);
-      return data;
+      const transformed = transformTasks(data);
+      setArratyTask(transformed);
+      return transformed;
     } catch (error) {
       console.error('Error al obtener las tareas:', error);
       return [];
@@ -41,36 +52,38 @@ function App(): React.JSX.Element {
   };
 
   useEffect(() => {
-  if (navigate === 'Home') {
-    getTask();
-  }
-}, [navigate]);
+    if (navigate === 'Home') {
+      getTask();
+    }
+  }, [navigate]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainerStyle}>
-        <View style={styles.mainContainer}>
-          <ImageBackground
-            style={styles.backgroundContainer}
-            source={require('./src/assets/calisobg.png')}>
-            {navigate === 'Home' ? (
-              <Home
-                data={arrayTask}
-                onPressItem={index => {
-                  setNavigate('TaskDetails');
-                  setItemIndexted(index);
-                }}
-              />
-            ) : navigate === 'AddTask' ? (
-              <AddTask />
-            ) : navigate === 'CompletedTask' ? (
-              <CompletedTask />
-            ) : (
-              <TaskDetails data={arrayTask} itemDetails={itemIndexted} />
-            )}
-          </ImageBackground>
-        </View>
-      </ScrollView>
+      {navigate === 'CompletedTask' ? (
+        <CompletedTask data={arrayTask.filter(t => t.status === 'Completada')} />
+      ) : (
+        <ScrollView contentContainerStyle={styles.contentContainerStyle}>
+          <View style={styles.mainContainer}>
+            <ImageBackground
+              style={styles.backgroundContainer}
+              source={require('./src/assets/calisobg.png')}>
+              {navigate === 'Home' ? (
+                <Home
+                  data={arrayTask}
+                  onPressItem={index => {
+                    setNavigate('TaskDetails');
+                    setItemIndexted(index);
+                  }}
+                />
+              ) : navigate === 'AddTask' ? (
+                <AddTask />
+              ) : (
+                <TaskDetails data={arrayTask} itemDetails={itemIndexted} />
+              )}
+            </ImageBackground>
+          </View>
+        </ScrollView>
+      )}
       <View style={styles.buttonBottom}>
         <BottomBarNavigation
           onPressTask={() => setNavigate('CompletedTask')}
