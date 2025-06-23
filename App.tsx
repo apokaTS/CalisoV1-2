@@ -13,10 +13,10 @@ import CompletedTask from './src/screens/CompletedTask';
 import TaskDetails from './src/screens/TaskDetails';
 
 function App(): React.JSX.Element {
-  // Puedes dejar este array como fallback si el fetch falla
+  // Dejaremos esta linea en caso de que el codigo ya no lo acepte
   const taskList = [
     {id: 0, desc: 'Hacer 20 planas'},
-    {id: 1, desc: 'PROCRASTINAR'},
+    {id: 1, desc: 'Tarea Programacion'},
   ];
 
   const [arrayTask, setArratyTask] = useState(taskList);

@@ -3,8 +3,13 @@ import React from 'react';
 import {TaskDetailsTypes} from '../utils/types/HomeScreen';
 import IconTime from 'react-native-vector-icons/FontAwesome';
 import BasicButton from '../components/BasicButton/BasicButton';
+import CheckBox from '../components/CheckBox/CheckBox';
 
-const TaskDetails = ({itemDetails, data}: TaskDetailsTypes) => {
+const TaskDetails = ({
+  itemDetails,
+  data,
+  onToggleComplete,
+}: TaskDetailsTypes & {onToggleComplete?: (id: string | number) => void}) => {
   const taskDetail = data?.[itemDetails];
 
   if (!taskDetail) {
@@ -15,29 +20,45 @@ const TaskDetails = ({itemDetails, data}: TaskDetailsTypes) => {
     );
   }
 
-  const {title, final, inicio, status, task} = taskDetail;
+  const {id, titleText, descText, final, inicio, status} = taskDetail;
 
   return (
     <View style={styles.mainContainer}>
       <View>
-        <Text style={styles.titleText}> Recordatorio</Text>
+        <Text style={styles.titleText}>Recordatorio</Text>
       </View>
       <View style={styles.dataContainer}>
-        <TextInput style={styles.titleInput} value={title} />
-        {task?.map((item, index) => (
-          <TextInput key={index} style={styles.descInput}>
-            {item.desc}
-          </TextInput>
-        ))}
+        <TextInput
+          style={styles.titleInput}
+          value={titleText}
+          editable={false}
+        />
+        <TextInput
+          style={styles.descInput}
+          value={descText}
+          editable={false}
+          multiline
+        />
         <View style={styles.timeContainer}>
           <IconTime name="clock-o" size={25} />
-          <Text>Inicio el...</Text>
-          <View style={styles.mientrasBorrame} />
+          <Text>Inicio:</Text>
+          <View style={styles.mientrasBorrame}>
+            <Text style={{textAlign: 'center', marginTop: 10}}>{inicio}</Text>
+          </View>
         </View>
         <View style={styles.timeContainer}>
           <IconTime name="clock-o" size={25} />
-          <Text>Termina el...</Text>
-          <View style={styles.mientrasBorrame} />
+          <Text>Termina:</Text>
+          <View style={styles.mientrasBorrame}>
+            <Text style={{textAlign: 'center', marginTop: 10}}>{final}</Text>
+          </View>
+        </View>
+        <View style={styles.timeContainer}>
+          <Text style={{fontWeight: 'bold'}}>Completada:</Text>
+          <CheckBox
+            checked={status === 'Completada'}
+            onChange={() => onToggleComplete && onToggleComplete(id)}
+          />
         </View>
         <View style={styles.bottomButtonEdit}>
           <BasicButton
@@ -46,15 +67,6 @@ const TaskDetails = ({itemDetails, data}: TaskDetailsTypes) => {
           />
         </View>
       </View>
-      {/*<Text style={styles.text}>{title}</Text>
-      <Text style={styles.text}>{final}</Text>
-      <Text style={styles.text}>{inicio}</Text>
-      <Text style={styles.text}>{status}</Text>
-      {task?.map((item, index) => (
-        <Text key={index} style={styles.text}>
-          {item.desc}
-        </Text>
-      ))}*/}
     </View>
   );
 };
@@ -73,7 +85,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-
   dataContainer: {
     marginTop: 60,
     borderRadius: 7,
@@ -83,7 +94,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-
   titleInput: {
     marginTop: 24,
     backgroundColor: '#fff',
@@ -94,7 +104,6 @@ const styles = StyleSheet.create({
     width: 350,
     height: 38,
   },
-
   descInput: {
     textAlignVertical: 'top',
     marginTop: 24,
@@ -106,7 +115,6 @@ const styles = StyleSheet.create({
     width: 350,
     height: 100,
   },
-
   timeContainer: {
     marginTop: 4,
     width: 350,
@@ -117,7 +125,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 10,
   },
-
   mientrasBorrame: {
     width: 200,
     height: 42,
@@ -126,8 +133,8 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     borderColor: '#000',
     backgroundColor: '#fff',
+    justifyContent: 'center',
   },
-
   bottomButtonEdit: {
     marginTop: 25,
   },
