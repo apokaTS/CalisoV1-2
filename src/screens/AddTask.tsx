@@ -8,14 +8,14 @@ const AddTask = () => {
   const [titleText, setTitleText] = useState<string>('');
   //Cambio de variable para el cambio de descripcion
   const [descText, setDescText] = useState<string>('');
-
+  //Cambio d variabl para la fecha
   const [dueDate, setDueDate] = useState(new Date());
 
   const isCompleted = false;
 
   const saveTask = async () => {
     try {
-      const response = await fetch('http://192.168.3.122:3000/tasks', {
+      const response = await fetch('http://192.168.1.121:3000/tasks', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({

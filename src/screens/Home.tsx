@@ -25,7 +25,7 @@ const Home = ({data, onPressItem}: HomeTypes) => {
       ),
     );
   };
-  //FILTRO BUSQUEDA NOMBRE
+  //Filtro para cambio de nombre
   const filterSearch = () => {
     return data.filter(task =>
       task.titleText.toLowerCase().includes(search.toLowerCase()),
@@ -89,11 +89,13 @@ const Home = ({data, onPressItem}: HomeTypes) => {
           <CardTask
             title={item.titleText}
             limitTask={item.final}
-            onPress={() => onPressItem(index)}
+            onPress={() => onPressItem && onPressItem(index)}
             startTask={item.inicio}
             statusCard={item.status}
             desc={item.descText}
             key={index}
+            checked={false}
+            onCheck={() => {}}
           />
         )}
       />

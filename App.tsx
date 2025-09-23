@@ -14,12 +14,18 @@ import TaskDetails from './src/screens/TaskDetails';
 
 function App(): React.JSX.Element {
   // Dejaremos esta linea en caso de que el codigo ya no lo acepte
-  const taskList = [
-    {id: 0, desc: 'Hacer 20 planas'},
-    {id: 1, desc: 'Tarea Programacion'},
-  ];
+  type TaskType = {
+    titleText: string;
+    descText: string;
+    inicio: string;
+    final: string;
+    status: string;
+    filter: string;
+  };
 
-  const [arrayTask, setArratyTask] = useState(taskList);
+  const initialTasks: TaskType[] = [];
+
+  const [arrayTask, setArratyTask] = useState<TaskType[]>(initialTasks);
   const [navigate, setNavigate] = useState<string>('Home');
   const [itemIndexted, setItemIndexted] = useState<number>(0);
 
@@ -37,7 +43,7 @@ function App(): React.JSX.Element {
 
   const getTask = async () => {
     try {
-      const response = await fetch('http://192.168.3.122:3000/tasks', {
+      const response = await fetch('http://192.168.1.121:3000/tasks', {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
       });

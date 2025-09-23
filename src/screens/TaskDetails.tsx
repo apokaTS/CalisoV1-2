@@ -8,7 +8,6 @@ import CheckBox from '../components/CheckBox/CheckBox';
 const TaskDetails = ({
   itemDetails,
   data,
-  onToggleComplete,
 }: TaskDetailsTypes & {onToggleComplete?: (id: string | number) => void}) => {
   const taskDetail = data?.[itemDetails];
 
@@ -20,7 +19,7 @@ const TaskDetails = ({
     );
   }
 
-  const {id, titleText, descText, final, inicio, status} = taskDetail;
+  const {titleText, descText, final, inicio, status} = taskDetail;
 
   return (
     <View style={styles.mainContainer}>
@@ -43,21 +42,20 @@ const TaskDetails = ({
           <IconTime name="clock-o" size={25} />
           <Text>Inicio:</Text>
           <View style={styles.mientrasBorrame}>
-            <Text style={{textAlign: 'center', marginTop: 10}}>{inicio}</Text>
+            <Text style={styles.styleTextTime}>{inicio}</Text>
           </View>
         </View>
         <View style={styles.timeContainer}>
           <IconTime name="clock-o" size={25} />
           <Text>Termina:</Text>
           <View style={styles.mientrasBorrame}>
-            <Text style={{textAlign: 'center', marginTop: 10}}>{final}</Text>
+            <Text style={styles.styleTextTime}>{final}</Text>
           </View>
         </View>
         <View style={styles.timeContainer}>
-          <Text style={{fontWeight: 'bold'}}>Completada:</Text>
+          <Text style={styles.styleText}>Completada:</Text>
           <CheckBox
             checked={status === 'Completada'}
-            onChange={() => onToggleComplete && onToggleComplete(id)}
           />
         </View>
         <View style={styles.bottomButtonEdit}>
@@ -137,5 +135,13 @@ const styles = StyleSheet.create({
   },
   bottomButtonEdit: {
     marginTop: 25,
+  },
+  styleTextTime: {
+    textAlign: 'center',
+    marginTop: 10,
+  },
+
+  styleText: {
+    fontWeight: 'bold',
   },
 });

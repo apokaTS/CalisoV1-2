@@ -2,8 +2,12 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, ImageBackground } from 'react-native';
 import CheckBox from '../components/CheckBox/CheckBox';
 
-const CompletedTask = ({ data }) => {
-  const renderItem = ({ item }) => (
+type CompletedTaskProps = {
+  data: { titleText: string }[];
+};
+
+const CompletedTask: React.FC<CompletedTaskProps> = ({ data }) => {
+  const renderItem = ({ item }: { item: { titleText: string } }) => (
     <View style={styles.row}>
       <CheckBox checked={true} disabled={true} />
       <Text style={styles.text}>{item.titleText}</Text>
