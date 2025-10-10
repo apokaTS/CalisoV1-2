@@ -3,31 +3,41 @@ import React, {useState} from 'react';
 import BasicButton from '../components/BasicButton/BasicButton';
 import DatePicker from '../components/DatePicker/DatePicker';
 
-const AddTask = () => {
-  //Cambio de variable para el titulo
-  const [titleText, setTitleText] = useState<string>('');
-  //Cambio de variable para el cambio de descripcion
-  const [descText, setDescText] = useState<string>('');
-  //Cambio d variabl para la fecha
-  const [dueDate, setDueDate] = useState(new Date());
+type AddTaskProps = {
+  onCreated?: () => void;
+};
 
-  const isCompleted = false;
+const API_BASE = 'http://192.168.3.103:3000';
+
+const AddTask = ({onCreated}: AddTaskProps) => {
+  // Título de la tarea
+  const [titleText, setTitleText] = useState<string>('');
+  // Descripción de la tarea
+  const [descText, setDescText] = useState<string>('');
+  // Fecha límite (Date)
+  const [dueDate, setDueDate] = useState<Date>(new Date());
 
   const saveTask = async () => {
     try {
-      const response = await fetch('http://192.168.1.121:3000/tasks', {
+      const response = await fetch(`${API_BASE}/tasks`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           titleText,
           descText,
-          dueDate,
-          isCompleted,
+          dueDate: dueDate.toISOString(),
+          isCompleted: false,
           createdAt: new Date().toISOString(),
         }),
       });
       const data = await response.json();
       console.log('Guardado:', data);
+      // Limpiar campos
+      setTitleText('');
+      setDescText('');
+      setDueDate(new Date());
+      // Llamar callback para refrescar en App
+      if (onCreated) onCreated();
     } catch (error) {
       console.error(error);
     }
@@ -40,7 +50,7 @@ const AddTask = () => {
         <TextInput
           style={styles.textInput1}
           value={titleText}
-          onChangeText={newTitleText => setTitleText(newTitleText)}
+          onChangeText={setTitleText}
           numberOfLines={1}
           multiline={false}
           maxLength={30}
@@ -51,7 +61,7 @@ const AddTask = () => {
         <TextInput
           style={styles.textInput2}
           value={descText}
-          onChangeText={newDescText => setDescText(newDescText)}
+          onChangeText={setDescText}
           multiline={true}
           numberOfLines={5}
           placeholder="Descripcion"
@@ -59,10 +69,10 @@ const AddTask = () => {
       </View>
       <View style={styles.dateContainer}>
         <Text style={styles.staticTextOfDate}>Fecha Limite</Text>
-        <DatePicker onDateChange={setDueDate}/>
+        <DatePicker onDateChange={setDueDate} />
       </View>
       <View style={styles.containerBottom} />
-        <BasicButton onPress={saveTask} text="Crear" variant={1}/>
+      <BasicButton onPress={saveTask} text="Crear" variant={1} />
     </View>
   );
 };
@@ -89,15 +99,17 @@ const styles = StyleSheet.create({
     marginTop: 50,
     backgroundColor: 'white',
     borderRadius: 10,
+    paddingHorizontal: 8,
   },
 
   textInput2: {
+    textAlignVertical: 'top',
     height: 130,
     width: 360,
     marginTop: 30,
     backgroundColor: 'white',
     borderRadius: 10,
-    textAlignVertical: 'top',
+    padding: 8,
   },
 
   dateContainer: {

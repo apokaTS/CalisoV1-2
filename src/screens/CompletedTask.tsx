@@ -1,13 +1,22 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, ImageBackground } from 'react-native';
+import {View, Text, FlatList, StyleSheet, ImageBackground} from 'react-native';
 import CheckBox from '../components/CheckBox/CheckBox';
 
-type CompletedTaskProps = {
-  data: { titleText: string }[];
+type TaskItem = {
+  id: string | number;
+  titleText: string;
+  descText?: string;
+  inicio?: string;
+  final?: string;
+  status?: string;
 };
 
-const CompletedTask: React.FC<CompletedTaskProps> = ({ data }) => {
-  const renderItem = ({ item }: { item: { titleText: string } }) => (
+type CompletedTaskProps = {
+  data: TaskItem[];
+};
+
+const CompletedTask: React.FC<CompletedTaskProps> = ({data}) => {
+  const renderItem = ({item}: {item: TaskItem}) => (
     <View style={styles.row}>
       <CheckBox checked={true} disabled={true} />
       <Text style={styles.text}>{item.titleText}</Text>
@@ -17,12 +26,11 @@ const CompletedTask: React.FC<CompletedTaskProps> = ({ data }) => {
   return (
     <ImageBackground
       style={styles.background}
-      source={require('../assets/calisobg.png')} // Ajusta la ruta si es necesario
-      resizeMode="cover"
-    >
+      source={require('../assets/calisobg.png')}
+      resizeMode="cover">
       <FlatList
         data={data}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={item => String(item.id)}
         renderItem={renderItem}
         ListHeaderComponent={
           <Text style={styles.header}>Tareas Completadas</Text>
@@ -39,10 +47,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  container: { padding: 16 },
-  header: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  text: { marginLeft: 12, fontSize: 16 },
+  container: {padding: 16, paddingBottom: 80},
+  header: {fontSize: 22, fontWeight: 'bold', marginBottom: 16, color: '#fff'},
+  row: {flexDirection: 'row', alignItems: 'center', marginBottom: 12},
+  text: {marginLeft: 12, fontSize: 16, color: '#fff'},
 });
 
 export default CompletedTask;

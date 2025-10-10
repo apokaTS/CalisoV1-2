@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
-import { CardTypes } from '../../utils/types/components';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Checkbox from '../CheckBox/CheckBox';
+import { CardTypes } from '../../utils/types/components';
 
 /**
  * Tipos de props para CardTask.
@@ -11,8 +11,9 @@ import Checkbox from '../CheckBox/CheckBox';
  * @property {() => void} onCheck - Función para cambiar el estado del checkbox.
  */
 type CardTaskProps = CardTypes & {
-  checked: boolean;
-  onCheck: () => void;
+  id?: string | number;
+  checked?: boolean;
+  onCheck?: (id?: string | number) => void;
 };
 
 /**
@@ -22,22 +23,31 @@ type CardTaskProps = CardTypes & {
  * @returns {JSX.Element}
  */
 const CardTask = ({
+  id,
   title,
   startTask,
   limitTask,
   statusCard,
   desc,
   onPress,
-  checked,
+  checked = false,
   onCheck,
 }: CardTaskProps) => {
+  const statusColor = (status: string | undefined) => {
+    if (!status) return '#f1c40f';
+    const s = status.toLowerCase();
+    if (s.includes('complet')) return '#2ecc71';
+    if (s.includes('venc')) return '#e74c3c';
+    return '#f1c40f';
+  };
+
   return (
     // Tarjeta principal, presionable para ver detalles
     <TouchableOpacity onPress={onPress} style={styles.mainContainer}>
       {/* Encabezado: título y estado visual */}
       <View style={styles.basicContainer}>
         <Text style={styles.titleCard}>{title}</Text>
-        <View style={[styles.statusIndicator, { backgroundColor: statusCard }]} />
+        <View style={[styles.statusIndicator, { backgroundColor: statusColor(statusCard) }]} />
       </View>
       {/* Descripción de la tarea */}
       <View style={styles.basicViewColumn}>
@@ -67,7 +77,7 @@ const CardTask = ({
         {/* Checkbox para marcar como completada */}
         <View style={[styles.basicViewColumn, styles.centerView]}>
           <Text style={styles.textSemiBold}>{'Finalizar'}</Text>
-          <Checkbox checked={checked} onChange={onCheck} />
+          <Checkbox checked={checked} onChange={() => onCheck && onCheck(id)} />
         </View>
       </View>
     </TouchableOpacity>

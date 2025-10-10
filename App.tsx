@@ -1,20 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  View,
-  ImageBackground,
-} from 'react-native';
+import {SafeAreaView, StyleSheet, View, ImageBackground} from 'react-native';
 import Home from './src/screens/Home';
 import AddTask from './src/screens/AddTask';
 import BottomBarNavigation from './src/components/BottomBarNavigation/BottomBarNavigation';
 import CompletedTask from './src/screens/CompletedTask';
 import TaskDetails from './src/screens/TaskDetails';
 
+/**
+ * Constante base para llamadas a la API.
+ * Ajusta la IP/host si es necesario para tu entorno.
+ */
+const API_BASE = 'http://192.168.3.117:3000';
+
 function App(): React.JSX.Element {
-  // Dejaremos esta linea en caso de que el codigo ya no lo acepte
   type TaskType = {
+    id: string | number;
     titleText: string;
     descText: string;
     inicio: string;
@@ -23,27 +23,26 @@ function App(): React.JSX.Element {
     filter: string;
   };
 
-  const initialTasks: TaskType[] = [];
-
-  const [arrayTask, setArratyTask] = useState<TaskType[]>(initialTasks);
+  const [arrayTask, setArratyTask] = useState<TaskType[]>([]);
   const [navigate, setNavigate] = useState<string>('Home');
   const [itemIndexted, setItemIndexted] = useState<number>(0);
 
-  // Función para transformar los datos del backend al formato esperado por Home
-  const transformTasks = (tasksFromBackend: any[]) => {
-    return tasksFromBackend.map(task => ({
-      titleText: task.titleText,
-      descText: task.descText,
+  // transforma datos del backend al formato interno y garantiza id
+  const transformTasks = (tasksFromBackend: any[]) =>
+    tasksFromBackend.map((task: any, index: number) => ({
+      id: task._id ?? task.id ?? index,
+      titleText: task.titleText ?? task.title ?? '',
+      descText: task.descText ?? task.desc ?? '',
       inicio: task.createdAt ? new Date(task.createdAt).toLocaleDateString() : '',
       final: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '',
       status: task.isCompleted ? 'Completada' : 'Pendiente',
-      filter: task.isCompleted ? 'Vencidas' : 'Nuevas', // Ajusta según tu lógica de filtros
+      filter: task.isCompleted ? 'Vencidas' : 'Nuevas',
     }));
-  };
 
+  // obtiene tareas desde backend
   const getTask = async () => {
     try {
-      const response = await fetch('http://192.168.1.121:3000/tasks', {
+      const response = await fetch(`${API_BASE}/tasks`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'},
       });
@@ -58,43 +57,69 @@ function App(): React.JSX.Element {
   };
 
   useEffect(() => {
-    if (navigate === 'Home') {
-      getTask();
+    // traer tareas al montar
+    getTask();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // toggle local del estado "Completada" por id + opcional sync con backend
+  const onToggleComplete = async (id: string | number) => {
+    setArratyTask(prev =>
+      prev.map(t => (t.id === id ? {...t, status: t.status === 'Completada' ? 'Pendiente' : 'Completada'} : t)),
+    );
+
+    // Intento de sincronización al backend (no obligatorio, manejar errores según necesites)
+    try {
+      await fetch(`${API_BASE}/tasks/${id}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({isCompleted: arrayTask.find(t => t.id === id)?.status !== 'Completada'}),
+      });
+    } catch (err) {
+      console.warn('No se pudo sincronizar cambio de completado con el servidor:', err);
     }
-  }, [navigate]);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       {navigate === 'CompletedTask' ? (
+        // CompletedTask maneja su propio scroll (FlatList). Se pasa solo tareas completadas.
         <CompletedTask data={arrayTask.filter(t => t.status === 'Completada')} />
       ) : (
-        <ScrollView contentContainerStyle={styles.contentContainerStyle}>
-          <View style={styles.mainContainer}>
-            <ImageBackground
-              style={styles.backgroundContainer}
-              source={require('./src/assets/calisobg.png')}>
-              {navigate === 'Home' ? (
-                <Home
-                  data={arrayTask}
-                  onPressItem={index => {
-                    setNavigate('TaskDetails');
-                    setItemIndexted(index);
-                  }}
-                />
-              ) : navigate === 'AddTask' ? (
-                <AddTask />
-              ) : (
-                <TaskDetails data={arrayTask} itemDetails={itemIndexted} />
-              )}
-            </ImageBackground>
-          </View>
-        </ScrollView>
+        // Resto de pantallas envueltas en ImageBackground sin ScrollView global
+        <View style={styles.mainContainer}>
+          <ImageBackground style={styles.backgroundContainer} source={require('./src/assets/calisobg.png')}>
+            {navigate === 'Home' ? (
+              <Home
+                data={arrayTask}
+                onPressItem={index => {
+                  setNavigate('TaskDetails');
+                  setItemIndexted(index);
+                }}
+                onToggleComplete={onToggleComplete}
+              />
+            ) : navigate === 'AddTask' ? (
+              <AddTask
+                onCreated={() => {
+                  // refrescar lista y volver a Home al crear una tarea nueva
+                  getTask();
+                  setNavigate('Home');
+                }}
+              />
+            ) : (
+              <TaskDetails data={arrayTask} itemDetails={itemIndexted} onToggleComplete={onToggleComplete} />
+            )}
+          </ImageBackground>
+        </View>
       )}
       <View style={styles.buttonBottom}>
         <BottomBarNavigation
           onPressTask={() => setNavigate('CompletedTask')}
           onPressAdd={() => setNavigate('AddTask')}
-          onPressHome={() => setNavigate('Home')}
+          onPressHome={() => {
+            setNavigate('Home');
+            getTask();
+          }}
         />
       </View>
     </SafeAreaView>
@@ -113,10 +138,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-  },
-  contentContainerStyle: {
-    flexGrow: 1,
-    marginBottom: 40,
   },
   buttonBottom: {
     marginTop: 0,

@@ -1,5 +1,5 @@
-import {StyleSheet, Text, TextInput, View} from 'react-native';
 import React from 'react';
+import {StyleSheet, Text, TextInput, View, ScrollView} from 'react-native';
 import {TaskDetailsTypes} from '../utils/types/HomeScreen';
 import IconTime from 'react-native-vector-icons/FontAwesome';
 import BasicButton from '../components/BasicButton/BasicButton';
@@ -8,6 +8,7 @@ import CheckBox from '../components/CheckBox/CheckBox';
 const TaskDetails = ({
   itemDetails,
   data,
+  onToggleComplete,
 }: TaskDetailsTypes & {onToggleComplete?: (id: string | number) => void}) => {
   const taskDetail = data?.[itemDetails];
 
@@ -19,10 +20,10 @@ const TaskDetails = ({
     );
   }
 
-  const {titleText, descText, final, inicio, status} = taskDetail;
+  const {id, titleText, descText, final, inicio, status} = taskDetail;
 
   return (
-    <View style={styles.mainContainer}>
+    <ScrollView contentContainerStyle={styles.mainContainer}>
       <View>
         <Text style={styles.titleText}>Recordatorio</Text>
       </View>
@@ -42,30 +43,28 @@ const TaskDetails = ({
           <IconTime name="clock-o" size={25} />
           <Text>Inicio:</Text>
           <View style={styles.mientrasBorrame}>
-            <Text style={styles.styleTextTime}>{inicio}</Text>
+            <Text style={styles.timeText}>{inicio}</Text>
           </View>
         </View>
         <View style={styles.timeContainer}>
           <IconTime name="clock-o" size={25} />
           <Text>Termina:</Text>
           <View style={styles.mientrasBorrame}>
-            <Text style={styles.styleTextTime}>{final}</Text>
+            <Text style={styles.timeText}>{final}</Text>
           </View>
         </View>
         <View style={styles.timeContainer}>
-          <Text style={styles.styleText}>Completada:</Text>
+          <Text style={styles.boldText}>Completada:</Text>
           <CheckBox
             checked={status === 'Completada'}
+            onChange={() => onToggleComplete && onToggleComplete(id)}
           />
         </View>
         <View style={styles.bottomButtonEdit}>
-          <BasicButton
-            onPress={() => console.log('Funcionando')}
-            text="Editar"
-          />
+          <BasicButton onPress={() => console.log('Editar')} text="Editar" />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -73,25 +72,29 @@ export default TaskDetails;
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
+    paddingBottom: 20,
   },
   titleText: {
     marginTop: 60,
-    fontSize: 50,
+    fontSize: 40,
     marginBottom: 8,
     fontWeight: 'bold',
     color: '#fff',
   },
+
   dataContainer: {
-    marginTop: 60,
+    marginTop: 40,
     borderRadius: 7,
     elevation: 10,
     width: 390,
-    height: 490,
     backgroundColor: '#fff',
     alignItems: 'center',
+    paddingBottom: 20,
+    paddingTop: 10,
   },
+
   titleInput: {
     marginTop: 24,
     backgroundColor: '#fff',
@@ -101,7 +104,9 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     width: 350,
     height: 38,
+    paddingHorizontal: 8,
   },
+
   descInput: {
     textAlignVertical: 'top',
     marginTop: 24,
@@ -112,9 +117,11 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     width: 350,
     height: 100,
+    padding: 8,
   },
+
   timeContainer: {
-    marginTop: 4,
+    marginTop: 12,
     width: 350,
     height: 87.5,
     justifyContent: 'space-between',
@@ -123,25 +130,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 10,
   },
+
   mientrasBorrame: {
     width: 200,
     height: 42,
-    elevation: 40,
+    elevation: 4,
     borderWidth: 0.5,
     borderRadius: 7,
     borderColor: '#000',
     backgroundColor: '#fff',
     justifyContent: 'center',
   },
+
+  timeText: {
+    textAlign: 'center',
+    marginTop: 6,
+    color: '#000',
+  },
+
   bottomButtonEdit: {
     marginTop: 25,
   },
-  styleTextTime: {
-    textAlign: 'center',
-    marginTop: 10,
-  },
-
-  styleText: {
+  boldText: {
     fontWeight: 'bold',
   },
 });

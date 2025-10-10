@@ -5,7 +5,11 @@ import FilterLabel from '../components/FilterLabel/FilterLabel';
 import CardTask from '../components/CardTask/CardTask';
 import {HomeTypes} from '../utils/types/HomeScreen';
 
-const Home = ({data, onPressItem}: HomeTypes) => {
+const Home = ({
+  data,
+  onPressItem,
+  onToggleComplete,
+}: HomeTypes & {onToggleComplete?: (id: string | number) => void}) => {
   const [search, onSetSearch] = useState<string>('');
   const arrayFilters = [
     {id: 0, name: 'Nuevas', isActive: false, isChecked: false},
@@ -82,22 +86,23 @@ const Home = ({data, onPressItem}: HomeTypes) => {
         )}
       </View>
       <FlatList
-        scrollEnabled={false}
         data={filteredTask}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={item => String(item.id)} // usar id único
         renderItem={({item, index}) => (
           <CardTask
+            id={item.id}
             title={item.titleText}
             limitTask={item.final}
             onPress={() => onPressItem && onPressItem(index)}
             startTask={item.inicio}
             statusCard={item.status}
             desc={item.descText}
-            key={index}
-            checked={false}
-            onCheck={() => {}}
+            checked={item.status === 'Completada'}
+            onCheck={id => onToggleComplete && onToggleComplete(id)}
           />
         )}
+        style={styles.flatList}
+        contentContainerStyle={styles.flatListContent}
       />
     </View>
   );
@@ -113,5 +118,12 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  flatList: {
+    flex: 1,
+    width: '100%',
+  },
+  flatListContent: {
+    paddingBottom: 80,
   },
 });
