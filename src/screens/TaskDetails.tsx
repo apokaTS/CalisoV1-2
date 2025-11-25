@@ -1,9 +1,19 @@
-import React from 'react';
-import {StyleSheet, Text, TextInput, View, ScrollView} from 'react-native';
+import React, {useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import {TaskDetailsTypes} from '../utils/types/HomeScreen';
 import IconTime from 'react-native-vector-icons/FontAwesome';
 import BasicButton from '../components/BasicButton/BasicButton';
 import CheckBox from '../components/CheckBox/CheckBox';
+import DatePicker from '../components/DatePicker/DatePicker';
+
+const API_BASE = 'http://192.168.3.107:3000';
 
 const TaskDetails = ({
   itemDetails,
@@ -11,6 +21,15 @@ const TaskDetails = ({
   onToggleComplete,
 }: TaskDetailsTypes & {onToggleComplete?: (id: string | number) => void}) => {
   const taskDetail = data?.[itemDetails];
+
+  // Estados para edición
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(taskDetail?.titleText || '');
+  const [editDesc, setEditDesc] = useState(taskDetail?.descText || '');
+  const [editFinal, setEditFinal] = useState(
+    new Date(taskDetail?.final || new Date()),
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
   if (!taskDetail) {
     return (
@@ -22,23 +41,109 @@ const TaskDetails = ({
 
   const {id, titleText, descText, final, inicio, status} = taskDetail;
 
+  /**
+   * Activa el modo edición y sincroniza los estados con los valores actuales
+   */
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditTitle(titleText);
+    setEditDesc(descText);
+    setEditFinal(new Date(final));
+  };
+
+  /**
+   * Cancela la edición y restaura los valores originales
+   */
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditTitle(titleText);
+    setEditDesc(descText);
+    setEditFinal(new Date(final));
+  };
+
+  /**
+   * Guarda los cambios en el backend
+   */
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      console.log('=== INICIANDO GUARDADO ===');
+      console.log('ID de tarea:', id);
+      console.log('Datos a enviar:', {
+        titleText: editTitle,
+        descText: editDesc,
+        dueDate: editFinal.toISOString(),
+      });
+
+      const response = await fetch(`${API_BASE}/tasks/${id}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          titleText: editTitle,
+          descText: editDesc,
+          dueDate: editFinal.toISOString(),
+        }),
+      });
+
+      console.log('Status de respuesta:', response.status);
+      console.log('Headers de respuesta:', response.headers);
+
+      // Obtener respuesta como texto primero
+      const responseText = await response.text();
+      console.log('Respuesta del servidor (texto):', responseText);
+
+      // Parsear como JSON si no está vacío
+      let data;
+      if (responseText) {
+        data = JSON.parse(responseText);
+      }
+
+      console.log('Respuesta del servidor (JSON):', data);
+
+      if (response.ok) {
+        console.log('✅ Tarea actualizada exitosamente');
+        Alert.alert('Éxito', 'Tarea actualizada correctamente');
+        setIsEditing(false);
+        setIsSaving(false);
+      } else {
+        console.error('❌ Error en respuesta:', data);
+        Alert.alert('Error', data?.message || `Error ${response.status}`);
+        setIsSaving(false);
+      }
+    } catch (error) {
+      console.error('❌ Error en la solicitud:', error);
+      console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+      Alert.alert('Error', 'Error: ' + String(error));
+      setIsSaving(false);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.mainContainer}>
       <View>
         <Text style={styles.titleText}>Recordatorio</Text>
       </View>
       <View style={styles.dataContainer}>
+        {/* Título editable */}
         <TextInput
           style={styles.titleInput}
-          value={titleText}
-          editable={false}
+          value={editTitle}
+          onChangeText={setEditTitle}
+          editable={isEditing}
+          placeholder="Título de la tarea"
         />
+
+        {/* Descripción editable */}
         <TextInput
           style={styles.descInput}
-          value={descText}
-          editable={false}
+          value={editDesc}
+          onChangeText={setEditDesc}
+          editable={isEditing}
           multiline
+          placeholder="Descripción de la tarea"
         />
+
+        {/* Fecha de inicio (solo lectura) */}
         <View style={styles.timeContainer}>
           <IconTime name="clock-o" size={25} />
           <Text>Inicio:</Text>
@@ -46,13 +151,23 @@ const TaskDetails = ({
             <Text style={styles.timeText}>{inicio}</Text>
           </View>
         </View>
+
+        {/* Fecha de término (editable si está en modo edición) */}
         <View style={styles.timeContainer}>
           <IconTime name="clock-o" size={25} />
           <Text>Termina:</Text>
-          <View style={styles.mientrasBorrame}>
-            <Text style={styles.timeText}>{final}</Text>
-          </View>
+          {isEditing ? (
+            <DatePicker onDateChange={setEditFinal} />
+          ) : (
+            <View style={styles.mientrasBorrame}>
+              <Text style={styles.timeText}>
+                {editFinal.toLocaleDateString()}
+              </Text>
+            </View>
+          )}
         </View>
+
+        {/* Checkbox de completado */}
         <View style={styles.timeContainer}>
           <Text style={styles.boldText}>Completada:</Text>
           <CheckBox
@@ -60,8 +175,21 @@ const TaskDetails = ({
             onChange={() => onToggleComplete && onToggleComplete(id)}
           />
         </View>
-        <View style={styles.bottomButtonEdit}>
-          <BasicButton onPress={() => console.log('Editar')} text="Editar" />
+
+        {/* Botones de acción */}
+        <View style={styles.buttonContainer}>
+          {!isEditing ? (
+            <BasicButton onPress={handleEdit} text="Editar" variant={1} />
+          ) : (
+            <>
+              <BasicButton
+                onPress={handleSave}
+                text={isSaving ? 'Guardando...' : 'Guardar'}
+                variant={2}
+              />
+              <BasicButton onPress={handleCancel} text="Cancelar" variant={3} />
+            </>
+          )}
         </View>
       </View>
     </ScrollView>
@@ -105,6 +233,8 @@ const styles = StyleSheet.create({
     width: 350,
     height: 38,
     paddingHorizontal: 8,
+    color: '#000',
+    fontWeight: '600',
   },
 
   descInput: {
@@ -118,6 +248,7 @@ const styles = StyleSheet.create({
     width: 350,
     height: 100,
     padding: 8,
+    color: '#000',
   },
 
   timeContainer: {
@@ -148,9 +279,14 @@ const styles = StyleSheet.create({
     color: '#000',
   },
 
-  bottomButtonEdit: {
+  buttonContainer: {
     marginTop: 25,
+    flexDirection: 'column',
+    gap: 12,
+    width: '100%',
+    alignItems: 'center',
   },
+
   boldText: {
     fontWeight: 'bold',
   },

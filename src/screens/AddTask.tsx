@@ -7,7 +7,7 @@ type AddTaskProps = {
   onCreated?: () => void;
 };
 
-const API_BASE = 'http://192.168.3.103:3000';
+const API_BASE = 'http://192.168.3.107:3000';
 
 const AddTask = ({onCreated}: AddTaskProps) => {
   // Título de la tarea

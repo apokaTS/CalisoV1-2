@@ -10,7 +10,7 @@ import TaskDetails from './src/screens/TaskDetails';
  * Constante base para llamadas a la API.
  * Ajusta la IP/host si es necesario para tu entorno.
  */
-const API_BASE = 'http://192.168.3.117:3000';
+const API_BASE = 'http://192.168.3.107:3000';
 
 function App(): React.JSX.Element {
   type TaskType = {
@@ -33,8 +33,14 @@ function App(): React.JSX.Element {
       id: task._id ?? task.id ?? index,
       titleText: task.titleText ?? task.title ?? '',
       descText: task.descText ?? task.desc ?? '',
-      inicio: task.createdAt ? new Date(task.createdAt).toLocaleDateString() : '',
+      // cadena legible para mostrar en UI
+      inicio: task.createdAt
+        ? new Date(task.createdAt).toLocaleDateString()
+        : '',
       final: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '',
+      // NUEVOS campos ISO para cálculo de fechas en la UI
+      inicioISO: task.createdAt ? new Date(task.createdAt).toISOString() : null,
+      finalISO: task.dueDate ? new Date(task.dueDate).toISOString() : null,
       status: task.isCompleted ? 'Completada' : 'Pendiente',
       filter: task.isCompleted ? 'Vencidas' : 'Nuevas',
     }));
@@ -65,7 +71,14 @@ function App(): React.JSX.Element {
   // toggle local del estado "Completada" por id + opcional sync con backend
   const onToggleComplete = async (id: string | number) => {
     setArratyTask(prev =>
-      prev.map(t => (t.id === id ? {...t, status: t.status === 'Completada' ? 'Pendiente' : 'Completada'} : t)),
+      prev.map(t =>
+        t.id === id
+          ? {
+              ...t,
+              status: t.status === 'Completada' ? 'Pendiente' : 'Completada',
+            }
+          : t,
+      ),
     );
 
     // Intento de sincronización al backend (no obligatorio, manejar errores según necesites)
@@ -73,10 +86,16 @@ function App(): React.JSX.Element {
       await fetch(`${API_BASE}/tasks/${id}`, {
         method: 'PATCH',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({isCompleted: arrayTask.find(t => t.id === id)?.status !== 'Completada'}),
+        body: JSON.stringify({
+          isCompleted:
+            arrayTask.find(t => t.id === id)?.status !== 'Completada',
+        }),
       });
     } catch (err) {
-      console.warn('No se pudo sincronizar cambio de completado con el servidor:', err);
+      console.warn(
+        'No se pudo sincronizar cambio de completado con el servidor:',
+        err,
+      );
     }
   };
 
@@ -84,11 +103,15 @@ function App(): React.JSX.Element {
     <SafeAreaView style={styles.container}>
       {navigate === 'CompletedTask' ? (
         // CompletedTask maneja su propio scroll (FlatList). Se pasa solo tareas completadas.
-        <CompletedTask data={arrayTask.filter(t => t.status === 'Completada')} />
+        <CompletedTask
+          data={arrayTask.filter(t => t.status === 'Completada')}
+        />
       ) : (
         // Resto de pantallas envueltas en ImageBackground sin ScrollView global
         <View style={styles.mainContainer}>
-          <ImageBackground style={styles.backgroundContainer} source={require('./src/assets/calisobg.png')}>
+          <ImageBackground
+            style={styles.backgroundContainer}
+            source={require('./src/assets/calisobg.png')}>
             {navigate === 'Home' ? (
               <Home
                 data={arrayTask}
@@ -107,7 +130,11 @@ function App(): React.JSX.Element {
                 }}
               />
             ) : (
-              <TaskDetails data={arrayTask} itemDetails={itemIndexted} onToggleComplete={onToggleComplete} />
+              <TaskDetails
+                data={arrayTask}
+                itemDetails={itemIndexted}
+                onToggleComplete={onToggleComplete}
+              />
             )}
           </ImageBackground>
         </View>

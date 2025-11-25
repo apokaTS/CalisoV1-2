@@ -1,8 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Checkbox from '../CheckBox/CheckBox';
-import { CardTypes } from '../../utils/types/components';
+import {CardTypes} from '../../utils/types/components';
 
 /**
  * Tipos de props para CardTask.
@@ -14,40 +20,79 @@ type CardTaskProps = CardTypes & {
   id?: string | number;
   checked?: boolean;
   onCheck?: (id?: string | number) => void;
+  // nuevos props opcionales ISO
+  startTaskISO?: string | null;
+  limitTaskISO?: string | null;
 };
 
-/**
- * Componente de tarjeta de tarea.
- * Muestra información de la tarea y permite marcarla como completada.
- * @param {CardTaskProps} props - Propiedades de la tarjeta.
- * @returns {JSX.Element}
- */
 const CardTask = ({
   id,
   title,
   startTask,
   limitTask,
+  startTaskISO,
+  limitTaskISO,
   statusCard,
   desc,
   onPress,
   checked = false,
   onCheck,
 }: CardTaskProps) => {
-  const statusColor = (status: string | undefined) => {
-    if (!status) return '#f1c40f';
-    const s = status.toLowerCase();
-    if (s.includes('complet')) return '#2ecc71';
-    if (s.includes('venc')) return '#e74c3c';
-    return '#f1c40f';
+  // umbrales ajustables
+  const SOON_THRESHOLD = 48 * 60 * 60 * 1000; // 48 horas
+  const NEW_THRESHOLD = 7 * 24 * 60 * 60 * 1000; // 7 días
+
+  const parseDateSafe = (iso?: string | null, fallback?: string) => {
+    if (iso) {
+      const d = new Date(iso);
+      if (!isNaN(d.getTime())) return d;
+    }
+    if (fallback) {
+      const d2 = new Date(fallback); // intenta parsear la cadena (puede fallar según formato)
+      if (!isNaN(d2.getTime())) return d2;
+    }
+    return null;
   };
 
+  const statusMetaFromDates = (
+    startIso?: string | null,
+    dueIso?: string | null,
+    startStr?: string,
+    dueStr?: string,
+  ) => {
+    const now = new Date();
+    const startDate = parseDateSafe(startIso, startStr);
+    const dueDate = parseDateSafe(dueIso, dueStr);
+
+    if (!dueDate) return {label: 'Sin fecha', color: '#151515ff'};
+
+    const diffToDue = dueDate.getTime() - now.getTime();
+    const diffFromStart = startDate
+      ? now.getTime() - startDate.getTime()
+      : Number.POSITIVE_INFINITY;
+
+    if (diffToDue < 0) return {label: 'Vencida', color: '#e74c3c'};
+    if (diffToDue <= SOON_THRESHOLD)
+      return {label: 'Próxima a vencer', color: '#f1c40f'};
+    if (diffFromStart <= NEW_THRESHOLD)
+      return {label: 'Nueva', color: '#2ecc71'};
+    return {label: 'Activa', color: '#e74c3c'};
+  };
+
+  const statusMeta = statusMetaFromDates(
+    startTaskISO ?? null,
+    limitTaskISO ?? null,
+    startTask,
+    limitTask,
+  );
+
   return (
-    // Tarjeta principal, presionable para ver detalles
     <TouchableOpacity onPress={onPress} style={styles.mainContainer}>
-      {/* Encabezado: título y estado visual */}
       <View style={styles.basicContainer}>
         <Text style={styles.titleCard}>{title}</Text>
-        <View style={[styles.statusIndicator, { backgroundColor: statusColor(statusCard) }]} />
+        <View
+          style={[styles.statusIndicator, {backgroundColor: statusMeta.color}]}
+        />
       </View>
       {/* Descripción de la tarea */}
       <View style={styles.basicViewColumn}>
@@ -87,7 +132,7 @@ const CardTask = ({
 export default CardTask;
 
 // Obtiene el ancho de la pantalla para el tamaño de la tarjeta
-const { width } = Dimensions.get('screen');
+const {width} = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   // Contenedor principal de la tarjeta
