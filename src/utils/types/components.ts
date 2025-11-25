@@ -2,6 +2,7 @@
 
 // CardTypes: define las propiedades (props) que recibirá un componente de tipo Card.
 export type CardTypes = {
+  id: number;
   /** Título principal que se mostrará en la tarjeta. */
   title: string;
 
